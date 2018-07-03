@@ -1,0 +1,11 @@
+
+{
+  "discord":{
+    "name":"<DISCORD BOT NAME>",
+    "token":"<DISCORD BOT TOKEN>"
+  },
+  "radarr":{
+    "url":"http://<RADARR.URL>/api",
+    "token":"<RADARR API HERE>"
+  }
+}
