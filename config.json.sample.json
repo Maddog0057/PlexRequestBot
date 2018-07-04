@@ -1,0 +1,12 @@
+
+{
+  "discord":{
+    "name":"<DISCORD BOT NAME>",
+    "token":"<DISCORD BOT TOKEN>",
+    "channel":"<LOCKED DISCORD CHANNEL>"
+  },
+  "radarr":{
+    "url":"http://<RADARR.URL>/api",
+    "token":"<RADARR API HERE>"
+  }
+}
