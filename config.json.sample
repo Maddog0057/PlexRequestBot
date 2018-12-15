@@ -1,11 +1,13 @@
-
 {
   "discord":{
-    "name":"<DISCORD BOT NAME>",
-    "token":"<DISCORD BOT TOKEN>"
+    "name":"<BOT_NAME>",
+    "token":"<BOT_TOKEN>"
   },
   "radarr":{
-    "url":"http://<RADARR.URL>/api",
-    "token":"<RADARR API HERE>"
+    "url":"<RADARR_URL>",
+    "token":"<RADARR_API_TOKEN>"
+  },
+  "omdb":{
+        "token":"<OMDB_API_TOKEN>"
   }
 }
