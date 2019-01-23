@@ -1,0 +1,3 @@
+requests==2.21.0
+discord==0.0.2
+omdb==0.10.1
