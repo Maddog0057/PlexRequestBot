@@ -126,7 +126,7 @@ async def getMovie(imdbid, ctx):
         "titleSlug":res['titleSlug'],
         "images":res['images'],
         "tmdbId":res['tmdbId'],
-        "rootFolderPath":"/mnt/MEDIA/MOVIES/",
+        "rootFolderPath":config["radarr"]["path"],
         "monitored":True})
     payload = json.dumps(payload)
     #payload = json.loads(payload)
