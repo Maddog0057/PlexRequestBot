@@ -3,12 +3,60 @@ import omdb
 import requests
 import json
 import os
+import sys
 import asyncio
 import time
+import datetime
+import logging
 from discord.ext import commands
 
 with open("config.json", 'r') as json_data_file:
     config = json.load(json_data_file);
+
+logDir = config["system"]["log"]
+logFile = logDir+config["discord"]["name"]+".log"
+errLog = logDir+config["discord"]["name"]+"-error.log"
+
+""""
+if (os.path.exists(logDir)) is False:
+    os.mkdir(logDir)
+
+if (os.path.exists(logFile)) is False:
+   sys.stdout = open(logFile, 'w+')
+    sys.stderr = open(errLog, 'w+')
+else:
+    sys.stdout = open(logFile, 'a')
+    sys.stderr = open(errLog, 'a')
+"""
+
+class StreamToLogger(object):
+   """
+   Fake file-like stream object that redirects writes to a logger instance.
+   """
+   def __init__(self, logger, log_level=logging.INFO):
+      self.logger = logger
+      self.log_level = log_level
+      self.linebuf = ''
+
+   def write(self, buf):
+      for line in buf.rstrip().splitlines():
+         self.logger.log(self.log_level, line.rstrip())
+
+logging.basicConfig(
+   level=logging.INFO,
+   format='%(asctime)s:%(levelname)s:%(name)s:%(message)s',
+   filename=logFile,
+   filemode='a'
+)
+
+stdout_logger = logging.getLogger('STDOUT')
+sl = StreamToLogger(stdout_logger, logging.INFO)
+sys.stdout = sl
+
+stderr_logger = logging.getLogger('STDERR')
+sl = StreamToLogger(stderr_logger, logging.ERROR)
+sys.stderr = sl
+
 
 url = config["radarr"]["url"]
 api = config["radarr"]["token"]
@@ -173,10 +221,10 @@ async def choice(ctx, ids, inmsg, embed, count):
 
 @bot.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
+    print("/n"+"DateStamp: "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+    print('Logged in as '+bot.user.name)
     print(bot.user.id)
-    print('------')
+    print('----------------')
 
 @bot.command()
 async def search(ctx, inmsg):
@@ -243,7 +291,7 @@ async def help(ctx):
     embed = discord.Embed(Title="Commands", description="Here are my commands: ", color=0x8C198C)
     embed.add_field(name= "!search <string> :", value="Searches for <string> and returns the top three results from IMDB. \nUSAGE: !search \"The Big Lebowski\" \n(NOTE: Multiword strings must be enclosed in quotes)")
     embed.add_field(name= "!get <string> :", value="Performs the same function as search but will prompt for a choice in movie to download to plex. \nUSAGE: !get \"totoro\"")
-    embed.add_field(name= "!rescan :", value="Tells Radarr to scan for all items that have not been grabbed yet. \nUSAGE: !rescanlib")
+    embed.add_field(name= "!rescan :", value="Tells Radarr to scan for all items that have not been grabbed yet. \nUSAGE: !rescan")
     embed.add_field(name= "!help :", value="Displays this help message. \nUSAGE: !help")
     await ctx.send(embed=embed)
 
