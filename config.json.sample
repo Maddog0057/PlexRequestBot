@@ -5,10 +5,13 @@
   },
   "radarr":{
     "url":"<RADARR_URL>",
-    "token":"<RADARR_API_TOKEN>"
+    "token":"<RADARR_API_TOKEN>",
     "path":"</path/to/plex/movies>"
   },
   "omdb":{
         "token":"<OMDB_API_TOKEN>"
+  },
+  "system":{
+        "log":"</path/to/log/file>"
   }
 }
