@@ -8,6 +8,7 @@ import asyncio
 import time
 import datetime
 import logging
+from logging.handlers import RotatingFileHandler
 from discord.ext import commands
 
 with open("config.json", 'r') as json_data_file:
@@ -15,24 +16,10 @@ with open("config.json", 'r') as json_data_file:
 
 logDir = config["system"]["log"]
 logFile = logDir+config["discord"]["name"]+".log"
-errLog = logDir+config["discord"]["name"]+"-error.log"
 
-""""
-if (os.path.exists(logDir)) is False:
-    os.mkdir(logDir)
-
-if (os.path.exists(logFile)) is False:
-   sys.stdout = open(logFile, 'w+')
-    sys.stderr = open(errLog, 'w+')
-else:
-    sys.stdout = open(logFile, 'a')
-    sys.stderr = open(errLog, 'a')
-"""
 
 class StreamToLogger(object):
-   """
-   Fake file-like stream object that redirects writes to a logger instance.
-   """
+
    def __init__(self, logger, log_level=logging.INFO):
       self.logger = logger
       self.log_level = log_level
@@ -42,12 +29,14 @@ class StreamToLogger(object):
       for line in buf.rstrip().splitlines():
          self.logger.log(self.log_level, line.rstrip())
 
+handler = RotatingFileHandler(logFile,"a",maxBytes=1048576,backupCount=5)
+
 logging.basicConfig(
    level=logging.INFO,
    format='%(asctime)s:%(levelname)s:%(name)s:%(message)s',
-   filename=logFile,
-   filemode='a'
+   handlers = [ handler ]
 )
+
 
 stdout_logger = logging.getLogger('STDOUT')
 sl = StreamToLogger(stdout_logger, logging.INFO)
@@ -194,7 +183,6 @@ async def getMovie(imdbid, ctx):
 async def choice(ctx, ids, inmsg, embed, count):
     await ctx.send('Reply with the number of your selection, or the next number in the sequence for three more results')
     reply = await bot.wait_for('message', check=is_channel)
-    #reply = bot.wait_for('message')
     print(reply.content)
     ch = int(reply.content)-1
     if(int(ch) > len(ids)):
