@@ -12,6 +12,6 @@
         "token":"<OMDB_API_TOKEN>"
   },
   "system":{
-        "log":"</path/to/log/file>"
+        "log":"</path/to/log/directory>"
   }
 }
