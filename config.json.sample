@@ -8,6 +8,11 @@
     "token":"<RADARR_API_TOKEN>",
     "path":"</path/to/plex/movies>"
   },
+  "sonarr":{
+    "url":"<SONARR_URL>",
+    "token":"<SONARR_API_TOKEN>",
+    "path":"</path/to/plex/TV>"
+  },
   "omdb":{
         "token":"<OMDB_API_TOKEN>"
   },

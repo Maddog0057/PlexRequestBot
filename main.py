@@ -12,7 +12,7 @@ from logging.handlers import RotatingFileHandler
 from discord.ext import commands
 
 with open("config.json", 'r') as json_data_file:
-    config = json.load(json_data_file);
+    config = json.load(json_data_file)
 
 logDir = config["system"]["log"]
 logFile = logDir+config["discord"]["name"]+".log"
@@ -47,17 +47,23 @@ sl = StreamToLogger(stderr_logger, logging.ERROR)
 sys.stderr = sl
 
 
-url = config["radarr"]["url"]
-api = config["radarr"]["token"]
+rurl = config["radarr"]["url"]
+rapi = config["radarr"]["token"]
+surl = config["sonarr"]["url"]
+sapi = config["sonarr"]["token"]
 bot = commands.Bot(command_prefix='!')
 bot.remove_command('help')
 #channel = config["discord"]["channel"]
-omdb.set_default('apikey', config["omdb"]["token"])
+tvdbapi = config["search"]["tvdb"]
+omdb.set_default('apikey', config["search"]["omdb"])
 
 #@bot.check
 async def is_channel(ctx):
 	print(ctx.channel)
 	return ctx.channel is str("plex_requests")
+
+def getTvdbToken:
+    
 
 def verify(imdbid, number):
     embed = discord.Embed(Title="IMDb Search", description="Number "+str(number)+" selected", color=0x53f442)
@@ -86,10 +92,31 @@ def find(mtitle, count):
             break
     return data
 
+def tvfind(mtitle, count, token):
+    query = omdb.search(mtitle) 
+    fincount = int(count)+2
+    print('finalcount is ', fincount)
+    data = dict()
+    count = int(count)
+    while True:
+        try:
+                res=query[count]
+        except:
+	        errormsg() 
+        try:
+                res = omdb.get(imdbid=str(res['imdb_id']), fullplot=False)
+        except:
+                errormsg()
+        data.update({int(count):res['imdb_id']})
+        count+= 1
+        if(count > fincount):
+            break
+    return data
+
 async def scanmov(ctx, mid):
     print(mid)
     method = str("/command/?")
-    lurl = (url+method+"apikey="+api)
+    lurl = (rurl+method+"apikey="+rapi)
     payload = dict()
     payload.update({'name':'MoviesSearch','movieIds':[int(mid)]})
     headers = {'content-type': 'application/json'}
@@ -101,7 +128,7 @@ async def scanmov(ctx, mid):
     await ctx.send("```Searching...```")
     while True:
         method = str("/command/"+str(jsp['id'])+"/?")
-        murl = (url+method+"apikey="+api)
+        murl = (rurl+method+"apikey="+rapi)
         res = requests.get(murl) 
         print(res.text)
         res = json.loads(res.text)
@@ -131,12 +158,12 @@ def format(data, mtitle, count):
 
 async def checkMovie(imdbid, ctx):
     method = str("/movie/?")
-    lurl = (url+method+"apikey="+api)
+    lurl = (rurl+method+"apikey="+rapi)
     response = requests.get(lurl)
     print(imdbid)
     if imdbid in response.text:
         mthd = str("/movie/lookup/imdb?imdbId="+imdbid+"&")
-        furl = (url+mthd+"apikey="+api)
+        furl = (rurl+mthd+"apikey="+rapi)
         res = requests.get(furl)
         item = json.loads(str(res.text))
         print(item)
@@ -151,7 +178,7 @@ async def checkMovie(imdbid, ctx):
 
 async def getMovie(imdbid, ctx):
     method = str("/movie/lookup/imdb?imdbId="+imdbid+"&")
-    lurl = str(url+method+"apikey="+api)
+    lurl = str(rurl+method+"apikey="+rapi)
     response = requests.get(lurl)
     res = json.loads(str(response.text))
     overview = str(res['overview'])
@@ -168,7 +195,7 @@ async def getMovie(imdbid, ctx):
     payload = json.dumps(payload)
     #payload = json.loads(payload)
     method = str("/movie/?")
-    lurl = str(url+method+"apikey="+api)
+    lurl = str(rurl+method+"apikey="+rapi)
     print(lurl)
     print(payload)
     headers = {'content-type': 'application/json'}
@@ -224,7 +251,7 @@ async def search(ctx, inmsg):
     embed = None
 
 @bot.command()
-async def get(ctx, inmsg):
+async def movie(ctx, inmsg):
     if 'and' in inmsg:
         inmsg = inmsg.replace('and', '&')
     ids = find(inmsg, 0)
@@ -233,16 +260,25 @@ async def get(ctx, inmsg):
     await choice(ctx, ids, inmsg, embed, 0)
 
 @bot.command()
+async def tv(ctx, inmsg):
+    if 'and' in inmsg:
+        inmsg = inmsg.replace('and', '&')
+    ids = tvfind(inmsg, 0)
+    embed = format(ids, inmsg, 0)
+    await ctx.send(embed=embed)
+    await choice(ctx, ids, inmsg, embed, 0)
+
+@bot.command()
 async def delmov(ctx, mid):
     method = str("/movie/"+mid)
-    lurl = (url+method+"/?apikey="+api)
+    lurl = (rurl+method+"/?apikey="+rapi)
     response = requests.delete(lurl)
     print(response.text)
 
 @bot.command()
 async def rescan(ctx):
     method = str("/command/?")
-    lurl = (url+method+"apikey="+api)
+    lurl = (rurl+method+"apikey="+rapi)
     payload = dict()
     payload.update({'name':'MissingMoviesSearch'})
     headers = {'content-type': 'application/json'}
@@ -255,7 +291,7 @@ async def rescan(ctx):
     oldmessage = str("NONE")
     while True:
         method = str("/command/"+str(jsp['id'])+"/?")
-        murl = (url+method+"apikey="+api)
+        murl = (rurl+method+"apikey="+rapi)
         res = requests.get(murl) 
         print(res.text)
         res = json.loads(res.text)
