@@ -62,8 +62,6 @@ async def is_channel(ctx):
 	print(ctx.channel)
 	return ctx.channel is str("plex_requests")
 
-def getTvdbToken:
-    
 
 def verify(imdbid, number):
     embed = discord.Embed(Title="IMDb Search", description="Number "+str(number)+" selected", color=0x53f442)
