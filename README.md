@@ -6,5 +6,6 @@ Currently, through discord intergration, this bot can poll IMDB for movie result
 ## INSTALLATION GUIDE:
 
 Run the following command and follow the prompts:
-
-wget https://github.com/Maddog0057/PlexRequestBot_Installer/releases/download/0.0.1/PlexRequestBot-Installer.sh && sudo bash PlexRequestBot-Installer.sh
+```bash
+wget https://raw.githubusercontent.com/Maddog0057/PlexRequestBot_Installer/master/PlexRequestBot-Installer.sh && sudo bash PlexRequestBot-Installer.sh
+```
