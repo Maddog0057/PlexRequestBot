@@ -12,7 +12,7 @@ from logging.handlers import RotatingFileHandler
 from discord.ext import commands
 
 with open("config.json", 'r') as json_data_file:
-    config = json.load(json_data_file);
+    config = json.load(json_data_file)
 
 logDir = config["system"]["log"]
 logFile = logDir+config["discord"]["name"]+".log"
@@ -28,6 +28,9 @@ class StreamToLogger(object):
    def write(self, buf):
       for line in buf.rstrip().splitlines():
          self.logger.log(self.log_level, line.rstrip())
+
+   def flush(self):
+      pass
 
 handler = RotatingFileHandler(logFile,"a",maxBytes=1048576,backupCount=5)
 
@@ -252,22 +255,23 @@ async def rescan(ctx):
     jsp = json.loads(response.text)
     print(jsp['id'])
     await ctx.send("```Searching...```")
-    oldmessage = str("NONE")
+    #oldmessage = str("NONE")
     while True:
         method = str("/command/"+str(jsp['id'])+"/?")
         murl = (url+method+"apikey="+api)
         res = requests.get(murl) 
         print(res.text)
         res = json.loads(res.text)
-        message = res['message']
+        #message = res['message']
         status = res['status']
-        print("status is "+status)
+        #print("status is "+status)
         time.sleep(15)
-        if message != oldmessage:
-            await ctx.send("```"+message+"```")
-        oldmessage = message
+        if status not in ('completed'):
+            print("status is "+status)
+            await ctx.send("```Still Searching```")
         if status in ('failed', 'completed'):
-            await ctx.send("```Finished!```")
+            await ctx.send("```"+status+"```")
+            print("Search Completed")
             break
 
 async def errormsg():
