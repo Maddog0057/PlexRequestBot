@@ -266,9 +266,9 @@ async def rescan(ctx):
         status = res['status']
         #print("status is "+status)
         time.sleep(15)
-        if status not in ('completed'):
+        if status not in ('completed', 'queued'):
             print("status is "+status)
-            await ctx.send("```Still Searching```")
+            await ctx.send("```"+res['message']+"```")
         if status in ('failed', 'completed'):
             await ctx.send("```"+status+"```")
             print("Search Completed")
